@@ -1,0 +1,115 @@
+<html>
+<head>
+	<title>Term Master Schedule</title>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="vendor/mustache.js"></script>
+	<script type="text/javascript">
+		var TMS = (function () {
+			var apiUrl = 'api/';
+
+			function get(args) {
+				return $.ajax({
+					url: apiUrl + 'get.php',
+					dataType: 'json',
+					data: args
+				});
+			}
+
+			return {
+				Get: get
+			};
+		})();
+	</script>
+	<script type="text/javascript">
+		$(function () {
+			var resultsContainer = document.getElementById('results'),
+				resultsPerPage = 20,
+				templates = {};
+
+			$('script[type="text/html"]').each(function () {
+				templates[this.id] = this.innerHTML;
+			});
+
+			function renderResults (results) {
+				resultsContainer.innerHTML = Mustache.to_html(
+					templates.ResultsTemplate,
+					{ Results: results.slice(0, resultsPerPage) }, 
+					templates
+				);
+			}
+
+			resultsContainer.innerHTML = templates.LoadingTemplate;
+			TMS.Get().done(renderResults);
+		});
+	</script>
+</head>
+
+<body>
+	<h1>Term Master Scedhule</h1>
+
+	<p>
+		Term:
+		<select>
+			<option>Fall Quarter 2013-2014</option>
+		</select>
+	</p>
+
+	<table>
+		<thead>
+			<tr>
+				<td>Subject</td>
+				<td>Number</td>
+				<td>Type</td>
+				<td>Section</td>
+				<td>CRN</td>
+				<td>Title</td>
+				<td>Time</td>
+				<td>Instructor</td>
+			</tr>
+			<tr>
+				<td><input type="text" /></td>
+				<td><input type="text" /></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td><input type="text" /></td>
+				<td>
+					<label for="M"><input type="checkbox" id="M" />M</label>
+					<label for="T"><input type="checkbox" id="T" />T</label>
+					<label for="W"><input type="checkbox" id="W" />W</label>
+					<label for="R"><input type="checkbox" id="R" />R</label>
+					<label for="F"><input type="checkbox" id="F" />F</label>
+				</td>
+				<td></td>
+			</tr>
+		</thead>
+		<tbody id="results">
+		</tbody>
+	</table>
+</body>
+
+<script id="LoadingTemplate" type="text/html">
+	<tr>Loading...</tr>
+</script>
+
+<script id="ResultsTemplate" type="text/html">
+	{{#Results}}
+		{{> CourseSectionTemplate}}
+	{{/Results}}
+</script>
+
+<script id="CourseSectionTemplate" type="text/html">
+	<tr>
+		<td>{{Subject}}</td>
+		<td>{{Number}}</td>
+		<td>{{Type}}</td>
+		<td>{{Section}}</td>
+		<td>{{CRN}}</td>
+		<td>{{Title}}</td>
+		<td></td>
+		<td>{{Instructor}}</td>
+	</tr>
+</script>
+
+
+</html>
