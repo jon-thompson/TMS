@@ -35,11 +35,28 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 			var resultsContainer = document.getElementById('results'),
 				resultsPerPage = 20,
 				term = document.getElementById('term'),
+				filters = document.getElementsByClassName('filter'),
 				templates = {};
 
 			$('script[type="text/html"]').each(function () {
 				templates[this.id] = this.innerHTML;
 			});
+
+			function filterResults(results) {
+				function filter(result) {
+					for (var i = 0; i < filters.length; i++) {
+						filter = new RegExp(filters[i].value, 'i');
+						field = filters[i].id;
+						if (!filter.test(result[field])) {
+							return false;
+						}
+					}
+
+					return true;
+				}
+
+				return results.filter(filter);
+			}
 
 			function sortResults (a, b) {
 				if (a.Subject < b.Subject) {
@@ -86,7 +103,14 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 			}
 
 			resultsContainer.innerHTML = templates.LoadingTemplate;
-			TMS.Get({ term: term.value }).done(renderResults).fail(function () {
+			TMS.Get({ term: term.value }).done(function (results) {
+				for (var i = 0; i < filters.length; i++) {
+					filters[i].addEventListener('keyup', function() {
+						renderResults(filterResults(results));
+					});
+				}
+				renderResults(results);
+			}).fail(function () {
 				resultsContainer.innerHTML = '';
 				alert('Could not load sections. Please try again.');
 			});
@@ -119,12 +143,12 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 				<td>Instructor</td>
 			</tr>
 			<tr>
-				<td><input type="text" /></td>
-				<td><input type="text" /></td>
+				<td><input id="Subject" class="filter" type="text" /></td>
+				<td><input id="Number" class="filter" type="text" /></td>
 				<td></td>
 				<td></td>
 				<td></td>
-				<td><input type="text" /></td>
+				<td><input id="Title" class="filter" type="text" /></td>
 				<td>
 					<label for="M"><input type="checkbox" id="M" />M</label>
 					<label for="T"><input type="checkbox" id="T" />T</label>
