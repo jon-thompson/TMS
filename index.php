@@ -1,3 +1,13 @@
+<?php
+
+require_once('api/lib/Database.class.php');
+
+$db = new Database();
+
+$termResults = $db->execute('SELECT DISTINCT Term FROM section');
+
+?>
+
 <html>
 <head>
 	<title>Term Master Schedule</title>
@@ -24,13 +34,50 @@
 		$(function () {
 			var resultsContainer = document.getElementById('results'),
 				resultsPerPage = 20,
+				term = document.getElementById('term'),
 				templates = {};
 
 			$('script[type="text/html"]').each(function () {
 				templates[this.id] = this.innerHTML;
 			});
 
+			function sortResults (a, b) {
+				if (a.Subject < b.Subject) {
+					return -1;
+				}
+				else if (a.Subject > b.Subject) {
+					return 1;
+				}
+
+				if (a.Number - b.Number !== 0) {
+					return a.Number - b.Number;
+				}
+
+				if (isNaN(a.Section) && isNaN(b.Section)) {
+					if (a.Section < b.Section) {
+						return -1;
+					}
+					else if (a.Section > b.Section) {
+						return 1;
+					}
+					else {
+						return 0;
+					}
+				}
+
+				if (isNaN(a.Section)) {
+					return -1;
+				}
+
+				if (isNaN(b.Section)) {
+					return 1;
+				}
+
+				return a.Section - b.Section;
+			}
+
 			function renderResults (results) {
+				results.sort(sortResults);
 				resultsContainer.innerHTML = Mustache.to_html(
 					templates.ResultsTemplate,
 					{ Results: results.slice(0, resultsPerPage) }, 
@@ -39,18 +86,23 @@
 			}
 
 			resultsContainer.innerHTML = templates.LoadingTemplate;
-			TMS.Get().done(renderResults);
+			TMS.Get({ term: term.value }).done(renderResults).fail(function () {
+				resultsContainer.innerHTML = '';
+				alert('Could not load sections. Please try again.');
+			});
 		});
 	</script>
 </head>
 
 <body>
-	<h1>Term Master Scedhule</h1>
+	<h1>Term Master Schedule</h1>
 
 	<p>
 		Term:
-		<select>
-			<option>Fall Quarter 2013-2014</option>
+		<select id="term">
+			<?php foreach ($termResults as $result) { 
+				echo "<option value=\"{$result['Term']}\">{$result['Term']}</option>";
+			} ?>
 		</select>
 	</p>
 

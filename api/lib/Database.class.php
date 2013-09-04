@@ -25,10 +25,7 @@ class Database {
 		$stmt = $this->conn->prepare($query);
 		$result = $stmt->execute($params);
 
-		if (!$result) {
-			var_dump($this->conn->errorInfo());
-		}
-		return $result;
+		return $result ? $stmt->fetchAll() : FALSE;
 	}
 }
 
