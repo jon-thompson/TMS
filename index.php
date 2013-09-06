@@ -36,6 +36,7 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 				resultsPerPage = 20,
 				term = document.getElementById('term'),
 				filters = document.getElementsByClassName('filter'),
+				timeFilters = document.getElementsByClassName('filter-time'),
 				templates = {};
 
 			$('script[type="text/html"]').each(function () {
@@ -44,6 +45,22 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 
 			function filterResults(results) {
 				function filter(result) {
+					var selectedTimes = [];
+
+					for (var i = 0; i < timeFilters.length; i++) {
+						if (timeFilters[i].checked) {
+							selectedTimes.push(timeFilters[i].id);
+						}
+					}
+
+					for (var i = 0; i < result.Times.length; i++) {
+						for (var j = 0; j < result.Times[i].Day.length; j++) {
+							if (selectedTimes.indexOf(result.Times[i].Day[j]) === -1) {
+								return false;
+							}
+						}
+					}
+
 					for (var i = 0; i < filters.length; i++) {
 						filter = new RegExp(filters[i].value, 'i');
 						field = filters[i].id;
@@ -103,12 +120,20 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 
 			resultsContainer.innerHTML = templates.LoadingTemplate;
 			TMS.Get({ term: term.value }).done(function (results) {
-				results.sort(sortResults);
-				for (var i = 0; i < filters.length; i++) {
-					filters[i].addEventListener('keyup', function() {
-						renderResults(filterResults(results));
-					});
+				function rerender () {
+					renderResults(filterResults(results));
 				}
+
+				results.sort(sortResults);
+
+				for (var i = 0; i < filters.length; i++) {
+					filters[i].addEventListener('keyup', rerender);
+				}
+
+				for (var i = 0; i < timeFilters.length; i++) {
+					timeFilters[i].addEventListener('change', rerender);
+				}
+
 				renderResults(results);
 			}).fail(function () {
 				resultsContainer.innerHTML = '';
@@ -145,16 +170,16 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 			<tr>
 				<td><input id="Subject" class="filter" type="text" size="4" /></td>
 				<td><input id="Number" class="filter" type="text" size="3" /></td>
-				<td></td>
+				<td><input id="Type" class="filter" type="text" size="8" /></td>
 				<td></td>
 				<td></td>
 				<td><input id="Title" class="filter" type="text" /></td>
 				<td>
-					<label for="M"><input type="checkbox" id="M" />M</label>
-					<label for="T"><input type="checkbox" id="T" />T</label>
-					<label for="W"><input type="checkbox" id="W" />W</label>
-					<label for="R"><input type="checkbox" id="R" />R</label>
-					<label for="F"><input type="checkbox" id="F" />F</label>
+					<label for="M"><input class="filter-time" type="checkbox" id="M" checked />M</label>
+					<label for="T"><input class="filter-time" type="checkbox" id="T" checked />T</label>
+					<label for="W"><input class="filter-time" type="checkbox" id="W" checked />W</label>
+					<label for="R"><input class="filter-time" type="checkbox" id="R" checked />R</label>
+					<label for="F"><input class="filter-time" type="checkbox" id="F" checked />F</label>
 				</td>
 				<td></td>
 			</tr>
