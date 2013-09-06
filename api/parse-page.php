@@ -7,7 +7,7 @@ if (!isset($_GET['url'])) {
 require_once('lib/Database.class.php');
 require_once('lib/Section.class.php');
 
-function processNodes($db, $nodes)
+function processNodes($db, $nodes, &$sections)
 {
 	$i = 0;
 	foreach ($nodes as $node) {
@@ -30,8 +30,8 @@ $dom = new DOMDocument();
 $dom->loadHTML(file_get_contents($url));
 $finder = new DomXPath($dom);
 
-processNodes($db, $finder->query("//tr[contains(@class, 'odd')]"));
-processNodes($db, $finder->query("//tr[contains(@class, 'even')]"));
+processNodes($db, $finder->query("//tr[contains(@class, 'odd')]"), $sections);
+processNodes($db, $finder->query("//tr[contains(@class, 'even')]"), $sections);
 
 echo json_encode($sections);
 

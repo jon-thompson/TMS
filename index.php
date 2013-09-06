@@ -182,7 +182,12 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 		<td>{{Section}}</td>
 		<td>{{CRN}}</td>
 		<td>{{Title}}</td>
-		<td></td>
+		<td>
+			{{^Times}}TBD{{/Times}}
+			{{#Times}}
+				{{Day}} {{Time}}<br />
+			{{/Times}}
+		</td>
 		<td>{{Instructor}}</td>
 	</tr>
 </script>
