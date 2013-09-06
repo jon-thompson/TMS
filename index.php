@@ -94,7 +94,6 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 			}
 
 			function renderResults (results) {
-				results.sort(sortResults);
 				resultsContainer.innerHTML = Mustache.to_html(
 					templates.ResultsTemplate,
 					{ Results: results.slice(0, resultsPerPage) }, 
@@ -104,6 +103,7 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 
 			resultsContainer.innerHTML = templates.LoadingTemplate;
 			TMS.Get({ term: term.value }).done(function (results) {
+				results.sort(sortResults);
 				for (var i = 0; i < filters.length; i++) {
 					filters[i].addEventListener('keyup', function() {
 						renderResults(filterResults(results));
@@ -143,8 +143,8 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 				<td>Instructor</td>
 			</tr>
 			<tr>
-				<td><input id="Subject" class="filter" type="text" /></td>
-				<td><input id="Number" class="filter" type="text" /></td>
+				<td><input id="Subject" class="filter" type="text" size="4" /></td>
+				<td><input id="Number" class="filter" type="text" size="3" /></td>
 				<td></td>
 				<td></td>
 				<td></td>

@@ -27,7 +27,7 @@ class Section {
 			$this->CRN
 		)) or die('Failed to delete.');
 
-		$r = $db->execute('INSERT INTO section (Term, CRN, Object) VALUES (?, ?, ?)', array(
+		$db->execute('INSERT INTO section (Term, CRN, Object) VALUES (?, ?, ?)', array(
 			$this->Term,
 			$this->CRN,
 			json_encode($this)
