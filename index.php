@@ -11,6 +11,7 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 <html>
 <head>
 	<title>Term Master Schedule</title>
+	<link rel="stylesheet" type="text/css" href="screen.css">
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	<script src="vendor/mustache.js"></script>
 	<script type="text/javascript">
@@ -144,30 +145,30 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 </head>
 
 <body>
-	<h1>Term Master Schedule</h1>
+	<h1 class="heading">Term Master Schedule</h1>
 
-	<p>
+	<div class="highlight tbl-tab">
 		Term:
 		<select id="term">
 			<?php foreach ($termResults as $result) { 
 				echo "<option value=\"{$result['Term']}\">{$result['Term']}</option>";
 			} ?>
 		</select>
-	</p>
+	</div>
 
-	<table>
-		<thead>
-			<tr>
-				<td>Subject</td>
-				<td>Number</td>
-				<td>Type</td>
-				<td>Section</td>
-				<td>CRN</td>
-				<td>Title</td>
-				<td>Time</td>
-				<td>Instructor</td>
+	<table class="tbl">
+		<thead class="tbl-label">
+			<tr class="tbl-label-tr">
+				<td width="7%">Subject</td>
+				<td width="7%">Number</td>
+				<td width="10%">Type</td>
+				<td width="7%">Section</td>
+				<td width="7%">CRN</td>
+				<td width="22%">Title</td>
+				<td width="20%">Time</td>
+				<td width="20%">Instructor</td>
 			</tr>
-			<tr>
+			<tr class="tbl-label-tr">
 				<td><input id="Subject" class="filter" type="text" size="4" /></td>
 				<td><input id="Number" class="filter" type="text" size="3" /></td>
 				<td><input id="Type" class="filter" type="text" size="8" /></td>
@@ -190,17 +191,26 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 </body>
 
 <script id="LoadingTemplate" type="text/html">
-	<tr>Loading...</tr>
+	<tr class="tbl-tr-empty">
+		<td colspan="100">Loading...</td>
+	</tr>
 </script>
 
 <script id="ResultsTemplate" type="text/html">
+	{{^Results}}
+	<tr class="tbl-tr tbl-tr-empty">
+		<td colspan="100">
+			<strong>No courses found.</strong> Try changing your filters or selecting a different term.
+		</td>
+	</tr>
+	{{/Results}}
 	{{#Results}}
 		{{> CourseSectionTemplate}}
 	{{/Results}}
 </script>
 
 <script id="CourseSectionTemplate" type="text/html">
-	<tr>
+	<tr class="tbl-tr">
 		<td>{{Subject}}</td>
 		<td>{{Number}}</td>
 		<td>{{Type}}</td>
@@ -210,7 +220,9 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 		<td>
 			{{^Times}}TBD{{/Times}}
 			{{#Times}}
-				{{Day}} {{Time}}<br />
+				<span class="l-tr">
+					<span class="l-td">{{Day}}</span> <span class="l-td">{{Time}}</span>
+				</span>
 			{{/Times}}
 		</td>
 		<td>{{Instructor}}</td>
