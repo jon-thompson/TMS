@@ -48,11 +48,6 @@ class Section {
 	}
 
 	public function save($db) {
-		$db->execute('DELETE FROM section WHERE Term = ? AND CRN = ?', array(
-			$this->Term,
-			$this->CRN
-		)) or die('Failed to delete.');
-
 		$db->execute('INSERT INTO section (Term, CRN, Object) VALUES (?, ?, ?)', array(
 			$this->Term,
 			$this->CRN,
