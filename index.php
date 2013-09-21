@@ -16,14 +16,21 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 	<script src="vendor/mustache.js"></script>
 	<script type="text/javascript">
 		var TMS = (function () {
-			var apiUrl = 'api/';
+			var apiUrl = 'api/',
+				cache = {};
 
 			function get(args) {
-				return $.ajax({
-					url: apiUrl + 'get.php',
-					dataType: 'json',
-					data: args
-				});
+				var key = 'get' + JSON.stringify(args);
+
+				if (!(key in cache)) {
+					cache[key] = $.ajax({
+						url: apiUrl + 'get.php',
+						dataType: 'json',
+						data: args
+					});
+				}
+
+				return cache[key];
 			}
 
 			return {
@@ -38,11 +45,8 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 				term = document.getElementById('term'),
 				filters = document.getElementsByClassName('filter'),
 				timeFilters = document.getElementsByClassName('filter-time'),
+				currentResults = [],
 				templates = {};
-
-			$('script[type="text/html"]').each(function () {
-				templates[this.id] = this.innerHTML;
-			});
 
 			function filterResults(results) {
 				function filter(result) {
@@ -119,27 +123,37 @@ $termResults = $db->execute('SELECT DISTINCT Term FROM section');
 				);
 			}
 
-			resultsContainer.innerHTML = templates.LoadingTemplate;
-			TMS.Get({ term: term.value }).done(function (results) {
-				function rerender () {
-					renderResults(filterResults(results));
-				}
+			function selectTerm () {
+				resultsContainer.innerHTML = templates.LoadingTemplate;
+				TMS.Get({ term: term.value }).done(function (results) {
+					results.sort(sortResults);
+					currentResults = results;
+					render();
+				}).fail(function () {
+					resultsContainer.innerHTML = '';
+					alert('Could not load sections. Please try again.');
+				});
+			}
 
-				results.sort(sortResults);
+			function render () {
+				renderResults(filterResults(currentResults));
+			}
 
-				for (var i = 0; i < filters.length; i++) {
-					filters[i].addEventListener('keyup', rerender);
-				}
-
-				for (var i = 0; i < timeFilters.length; i++) {
-					timeFilters[i].addEventListener('change', rerender);
-				}
-
-				renderResults(results);
-			}).fail(function () {
-				resultsContainer.innerHTML = '';
-				alert('Could not load sections. Please try again.');
+			$('script[type="text/html"]').each(function () {
+				templates[this.id] = this.innerHTML;
 			});
+
+			for (var i = 0; i < filters.length; i++) {
+				filters[i].addEventListener('keyup', render);
+			}
+
+			for (var i = 0; i < timeFilters.length; i++) {
+				timeFilters[i].addEventListener('change', render);
+			}
+
+			term.addEventListener('change', selectTerm);
+
+			selectTerm();
 		});
 	</script>
 </head>
