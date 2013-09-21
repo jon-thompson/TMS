@@ -46,14 +46,6 @@ class Section {
 			$this->Times[] = $time;
 		}
 	}
-
-	public function save($db) {
-		$db->execute('INSERT INTO section (Term, CRN, Object) VALUES (?, ?, ?)', array(
-			$this->Term,
-			$this->CRN,
-			json_encode($this)
-		)) or die('Failed to insert.');
-	}
 }
 
 ?>

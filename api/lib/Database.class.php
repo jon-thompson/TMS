@@ -8,6 +8,7 @@ class Database {
 	private $DEBUG = false;
 
 	private $conn;
+	private $error;
 
 	public function __construct() {
 		try {
@@ -34,7 +35,14 @@ class Database {
 			return $stmt->fetchAll();
 		}
 
+		$this->error = $stmt->errorInfo()[2];
+
 		return $result;
+	}
+
+	public function getError()
+	{
+		return $this->error;
 	}
 }
 
