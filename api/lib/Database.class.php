@@ -35,7 +35,7 @@ class Database {
 			return $stmt->fetchAll();
 		}
 
-		$this->error = $stmt->errorInfo()[2];
+		$this->error = $stmt->errorInfo();
 
 		return $result;
 	}

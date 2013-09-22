@@ -43,7 +43,7 @@ function saveSections($db, $sections)
 		$params[] = json_encode($section);
 	}
 
-	$db->execute($query, $params) or die("Failed to insert.\n" . $db-getError());
+	$db->execute($query, $params) or die("Failed to insert.\n" . print_r($db-getError(), TRUE));
 }
 
 function processTerms(&$db, $nodes)
